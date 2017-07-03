@@ -1,0 +1,22 @@
+#+ summary: just seeing if this works
+#+ endpoint: http://virtuoso.clariah-sdh.eculture.labs.vu.nl/sparql
+#+ tags:
+#+   - hisco
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX hisco: <http://data.socialhistory.org/resource/hisco/>
+PREFIX hiscam: <http://data.socialhistory.org/resource/hiscam/v131/>
+
+SELECT distinct ?label ?hisco ?hiscam_value WHERE {
+ hisco:jobHoard skos:member ?job .
+ ?job skos:prefLabel ?label . # for standardized titles 
+ OPTIONAL {hisco:job skos:hiddenLabel ?label} . # comment this out if you're just looking for 'proper' occupational titles
+ hisco:category skos:member ?hisco.
+ ?hisco skos:member ?job . 
+  FILTER(lang(?label) = "nl") . # filter on a given language, like "es", "nl", "se"
+  FILTER regex(?label, "^slag", "i") . # uncomment this line if you want to filter for a specific (part of a) job title
+ ?hisco hiscam:u1 ?hiscam_value .
+} 
+LIMIT 5
